@@ -1,0 +1,151 @@
+---
+title: "What Factors Affect the Number of Children born in Canada?"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+gss <- read.csv("/cloud/project/gss.csv")
+library(tidyverse)
+require(dplyr)
+gss <- gss %>%
+  mutate(lives_with_partner = ifelse(lives_with_partner == "No", 0, 1))
+```
+
+---
+title: What Factors Affect the Number of Children born in Canada? 
+author: Kelvin Lin, Ziad El Ramlawy, Chang Xu
+date: October 19, 2020
+output: pdf_document
+---
+
+
+
+## What Factors Affect the Number of Children born in Canada?
+
+# Kelvin Lin, Ziad El Ramlawy, Chang Xu
+# October 18, 2020
+
+## Abstract
+
+<!-- Here is where you give a brief (one paragraph overview of your entire paper). This should include some background/introduction, some methodology, results and conclusions. -->
+
+Our study is based on the Canadian General Social Survery(GSS) of 2017 data. The goal of our analysis is to try to identify a relationship between number of children and other variables. In this study we try to find out what causes people  to have more or less children. We will use a multiple linear regression model in order to test the variables while keeping other important ones fixed. We concluded that many variables such as age at first birth, number of marriages, sex, and living situation all have an effect on the number of children a person has. We then proceeded to come to conlcusions as to why and how these variables affect the number of children.
+
+## Introduction
+
+<!-- Here is where you should give insight into the setting and introduce the goal of the analysis. Here you can introduce ideas and basic concepts regarding the study setting and the potential model. Again, this is the introduction, so you should be explaining the importance of the work that is ahead and hopefully build some suspense for the reader. You can also highlight what will be included in the subsequent sections. -->
+
+Population growth in general is one of the primary factors of economic development in Canada. With many developed countries having slow population growth in terms of child birth, it is expected that the economy will not develop as quickly as it has in the past. For that reason we will look at the relationship between total number of children a person has and other variables. Such as, their age when they had their first child, number of marriages, sex, and current living situation. We are going to be using a linear regression model to estimate our calculations. 
+
+
+
+## Data
+
+<!-- Introduce the data, explain why it was selected. Make sure to comment on important features and highlight any potential drawbacks to the data. -->
+
+  The data that we are using is the Canadian General Social Survey downloaded from the UofT CHASS website. The GSS data available ranges from 1985 to 2017, we chose to use the 2017 data as it is the most recently collected data available. The target populations of this data is everyone who is 15 years of age and older living in Canada, and not institutionalized. The sample population we have is everyone who is 15 years of age and older living in Canada, and not institutionalized, who has responded to the survey and has at least one child. The sample size of our study is 13,764 observations, which we obtained by subtracting the 6836 missing observations from the 20602 GSS data observations.
+  The variables we chose to analyze are total children, a persons age when they had their first child, number of marriages, sex, and current living situation. The total children variable includes any children reported by the respondent. One of the limitations to our model is that any respondent that does not have children will not be included in the data because of the age at first child variable which do not have values for people without children. Another drawback from the data is that we are sampling a small percentage of the total Canadian population which means it may not be the most accurate reflection of the population as a whole.
+
+
+## Model
+
+<!-- Introduce the selected model here. It is expected that you will use some mathematical notation here. If you do please ensure that all notation is explained. You may also want to discuss any special (hypothetical) cases of your model here, as well as any caveats.   -->
+
+We will be using a multiple linear regression model to analyze the variables we selected - total children, age at first child, number of marriages, sex, and current living situation. 
+
+
+
+```{r}
+
+library(broom)
+
+Model<- lm(formula = total_children ~ age_first_child + number_marriages + 
+    is_male + lives_with_partner, data = gss)
+
+Model_Summary <- summary(lm(formula = total_children ~ age_first_child + number_marriages + 
+    is_male + lives_with_partner, data = gss))
+
+broom::tidy(Model)
+
+lm_age_first_child <- lm(formula = total_children ~ age_first_child, data = gss)
+lm_number_marriages <- lm(formula = total_children ~ number_marriages, data = gss)
+lm_is_male <- lm(formula = total_children ~ is_male, data = gss)
+lm_lives_with_partner <- lm(formula = total_children ~ lives_with_partner, data = gss)
+ 
+```
+
+The formula we have represents a multiple linear model where each beta value represents the average increase of the y variable when the corresponding x value increases by one unit. The $\epsilon_{i}$ at the end is known as the error term and represents the margin of error.
+
+Mathematical Notation:
+
+$y_{i} = \beta_{0}+\beta_{1}x_{1i}+\beta_{2}x_{2i}+\beta_{3}x_{3i}+\beta_{4}x_{4i} + \epsilon_{i}$
+
+$y_{i} = 1.36+.023x_{1i}+.25x_{2i}+.082x_{3i}+.27_{4i} + \epsilon_{i}$
+
+## Results
+
+<!-- Here you will include all results. This includes descriptive statistics, graphs, figures, tables, and model results. Please ensure that everything is well formatted and in a report style. You must also provide an explanation of the results in this section. You can overflow to an Appendix if needed.  -->
+
+<!-- Please ensure that everything is well labelled. So if you have multiple histograms and plots, calling them Figure 1, 2, 3, etc. and referencing them as Figure 1, Figure 2, etc. in your report will be expected. The reader should not get lost in a sea of information. Make sure to have the results be clean, well formatted and digestible. -->
+
+  We created a multiple linear model with the data variable we chose. In order to decide whether or not to keep the variables we had to look at the p-values. All four of our x variables have low p-values which means they are of statistical significance. The first variable compared total children to the age the parent was when they had their first child, we noticed that for every yearly age increase we see an average of .023 more children when all other variables are fixed at a constant value. This also means that on average a person who has their first child 20 years after someone else will have around .023*20 less children when the other variables are constant. In terms of the number of marriages we noticed that for every increase in the number of marriages we see an average of .245 more children when all other variables are fixed, meaning that someone with 3 marriages will have around .5 more children on average than someone married once. The next variable we looked at was sex, which was a variable with output 1 for male and 0 for female. This highlighted that a person who is male will on average have .08 more kids than someone who is female when the rest of the variables are fixed. Our final variable looked at the current living situation, whether or not the person was living with their partner. We noticed that on average people living with their partners had a .27 more children than someone not living with their children.
+  Given the values we found and the multiple regression formula we discussed earlier, this is the regression we came up with.
+  
+$y_{i} = 1.36+.023x_{1i}+.25x_{2i}+.082x_{3i}+.27_{4i} + \epsilon_{i}$
+
+```{r}
+
+plot(total_children ~ age_first_child, data = gss, main= "Total Children vs Age at First Child", sub = "Figure 1", xlab = "Age at First Child", ylab = "Total Number of Children")
+abline(lm_age_first_child)
+
+plot(total_children ~ number_marriages, data = gss, main= "Total Children vs Number of Marriages", sub = "Figure 2", xlab = "Number of Marriages", ylab = "Total Number of Children")
+abline(lm_number_marriages)
+
+plot(total_children ~ is_male, data = gss, main= "Total Children vs Sex", sub = "Figure 3", xlab = "Sex", ylab = "Total Number of Children")
+abline(lm_is_male)
+
+plot(total_children ~ lives_with_partner, data = gss, main= "Total Children vs Living Situation", sub = "Figure 4", xlab = "Living Situation", ylab = "Total Number of Children")
+abline(lm_lives_with_partner)
+
+```
+We included 4 linear models of the variables we have in the multiple regression model. In Figure 1 it is difficult to notice a pattern by just looking at the points alone. The reason this figure as well as the other ones are like this is because there are only 7 possible values for number of children. For that reason we look at the linear regression line relating the two variables. This line gives us more of an idea of the correlation between the variables as we can see a positive relationship. In Figure 2 we are looking at the relationship between total children and number of marriages, this figure only has 28 possible points because there are 7 possible values for Number of Children and 4 values for Number of Marriages. This is why it seems as though the points are uniformly distributed across the plot. However, the line of best fit highlights the correlation between the two variables as we can see it sloping upwards. In terms of Figures 3 and 4, the plots do not provide us with too much useful information because the x values are indicator variables. In this case for Figure 3 0 means a person is female and 1 means they are male. In terms of Figure 4 0 means a person is no longer living with their partner other while 1 means they are still living with their partner. This information is more useful when looking at the multiple linear model as shown earlier rather than the simple regressions and plots above.
+
+
+## Discussion
+
+<!-- Here you will discuss conclusions drawn from the results and comment on how it relates to the original goal of the study (which was specified in the Introduction). -->
+
+Earlier we mentioned the importance of population growth for an economy. We then proceeded to look at multiple variables in an attempt to understand what cause people to have more children than others. We noticed that all the variables we looked at had a significant effect on number of children however some variables had a larger effect than others. Our first variable gave us a positive relationship between age at first birth and number of children. This is not what we expected however, it can be argued that people who choose to wait before having children are usually more financially stable and end up having more kids. While people who have kids early on in their life never gain too much financial stability and thus do not end up having more kids. The number of marriages variable was as we expected as the total children increased as a person had more marriages. When looking at the sex variable we noticed that men have more children on average than women and this could be attributed to multiple factors. For example men are able to father children up until an older age than women, additionally men do not carry the burden of child birth and can have multiple children in a short time span. Finally we noticed an increase in total children for those still living with their partners and this would be attributed the fact that people who are together will have children while those who have separated are more likely to stop having children with one another.
+
+# Weaknesses
+
+<!-- Here we discuss weaknesses of the study, data, analysis, etc. You can also discuss areas for improvement. -->
+
+In terms of the data there were some weaknesses that may have had an effect on the accuracy of our results. We mentioned earlier the problem behind have a small sample size relative to the population size. The sample size in the data consisted of 20602 observations. However, we used even less of the data because we had to omit any row that was missing a value for any of our variables of interest. This led us to omit 6836 observations, leaving us with a total 13766. Additionally, there are up to 83 variables in the survey meaning people might be tired of answering survey questions leading them to provide incorrect answers or avoid responding to some questions. In terms of our analysis the plots we felt that the plot used were not the most efficient way of displaying the data. This is because we only had seven possible y values for the regression which ranged from 1-7. Additionally because we used age at first birth that omitted anyone who did not have children from the data. This makes the analysis about people who already have at least one child and does not take into account those who did not have children. These weaknesses all affect the accuracy of the results, however we gained a good sense of our study and of the topic we are discussing.
+
+# Next Steps
+
+<!-- Here you discuss subsequent work to be done after this report. This can include next steps in terms of statistical analysis (perhaps there is a more efficient algorithm available, or perhaps there is a caveat in the data that would allow for some new technique). Future steps should also be specified in terms of the study setting (eg. including a follow-up survey on something, or a subsequent study that would complement the conclusions of your report). -->
+
+Looking back at our drawbacks and data, if we were to provide a survey we would attempt to create one with only the questions we need in order to ensure that is short and easily answerable. Additionally we would use a variable other than age at first birth in order to inlcude all of the people who do not have any children. In order to further improve our accuracy we could have looked at the diagnostic plots in order to test for the linear regression assumptions. This would inform us of actual linearity of our data so that if it were not linear we could try a different model. We also would try to find a different way to display the indicator variables that we used for figures 3 and 4. This is because given that we only have 7 possible outputs then the indicator variable plots do not provide and significant form of visualization of the data.
+
+
+## References
+Alexander, R. (2020, May 17). Telling Stories With Data. 
+  Retrieved from https://www.tellingstorieswithdata.com/
+
+Peterson, E. W. F. (2017). The Role of Population in Economic Growth. SAGE Open. 
+  https://doi.org/10.1177/2158244017736094
+  
+Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686,
+  https://doi.org/10.21105/joss.01686
+  
+Wickham, H., François, R., Henry, L., & Müller, K. (2020). dplyr: A Grammar of Data Manipulation. https://dplyr.tidyverse.org, https://github.com/tidyverse/dplyr.
+
+Xie, Y. (2020). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version 1.30.
+
+
